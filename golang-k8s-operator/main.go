@@ -20,6 +20,7 @@ import (
 )
 
 var namespace string
+var outputfilename string
 
 var yamldata_openfaas = `
 deployment:
@@ -155,11 +156,12 @@ func main() {
 	}
 	//	fmt.Printf("--- t dump:\n%s\n\n", string(d))
 
-	WriteWithIoutil("test.txt", string(d))
+	WriteWithIoutil(outputfilename, string(d))
 }
 
 func Init() {
 	flag.StringVar(&namespace, "namespace", "default", "k8s namesapce , such as default")
+	flag.StringVar(&outputfilename, "o", "deploy.yml", "output file name")
 }
 
 func IdentifyOpenfaas(i_namesapce string, i_deployment string) bool {
