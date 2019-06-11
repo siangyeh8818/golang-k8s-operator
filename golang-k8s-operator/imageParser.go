@@ -52,7 +52,7 @@ func ImagenameSplit(rawimage string) (string, string, string) {
 				*/
 			}
 		}
-		return_image = parsername[1] + "/" + tag[0]
+		return_image = tag[0]
 		return_image_tag = tag[1]
 		hub = parsername[1]
 	}
