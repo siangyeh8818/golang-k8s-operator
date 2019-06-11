@@ -1,0 +1,59 @@
+deployment:
+    k8s:
+      - module: ansible-repo-service
+        image: gde/reposervice
+        tag: c4f093d
+        stage: gde
+      - module: cloudkit
+        image: gde/cloudkit
+        tag: 912877c
+        stage: gde
+      - module: cronjob
+        image: gde/cronjob
+        tag: 03a5128
+        stage: gde
+      - module: eventbroker
+        image: gde/eventbroker
+        tag: 85241fa
+        stage: gde
+      - module: gateone
+        image: gde/gateone
+        tag: f037215
+        stage: gde
+      - module: ofsm-runner
+        image: gde/ofsm-runner
+        tag: "2749538"
+        stage: gde
+      - module: portal-v2
+        image: gde/portal-v2
+        tag: a8e62277
+        stage: gde
+      - module: redis-workflow
+        image: redis
+        tag: 5.0.4-alpine3.9
+        stage: ""
+      - module: router
+        image: jhow-gde/router
+        tag: 1.2.0
+        stage: jhow-gde
+      - module: scripts-runner
+        image: dev/scripts-runner
+        tag: mike-052002
+        stage: dev
+      - module: scripts-service
+        image: gde/scripts-service
+        tag: 0c19628
+        stage: gde
+      - module: sftp
+        image: gde/sftp
+        tag: 2d54421
+        stage: gde
+      - module: upload
+        image: master/upload
+        tag: 9cae58f
+        stage: master
+      - module: workflows-eventhandler
+        image: gde/workflows-eventhandler
+        tag: a84aa61
+        stage: gde
+    openfaas: []

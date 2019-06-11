@@ -3,17 +3,23 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"strings"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
+
 	//"log"
 	"os"
 	"path/filepath"
+
 	//	"time"
 	yaml "gopkg.in/yaml.v3"
 )
+
+var namespace string
 
 var yamldata_openfaas = `
 deployment:
@@ -54,21 +60,28 @@ service: openfaas-hello-world
 type K8sClient kubernetes.Clientset
 
 func main() {
-	test := K8sYaml{}
-	err := yaml.Unmarshal([]byte(yamldata_k8s), &test)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-	fmt.Printf("K8S_YAML:\n%v\n\n", test)
-	fmt.Println(test.Deployment.K8S)
-	fmt.Println(test.Deployment.K8S[0])
-	fmt.Println(test.Deployment.K8S[1])
-	fmt.Println(len(test.Deployment.K8S))
-	fmt.Println(test.Deployment.K8S[0].Module)
-	fmt.Println(test.Deployment.K8S[0].Image)
-	fmt.Println(test.Deployment.K8S[0].Tag)
-	fmt.Println(test.Deployment.K8S[0].Stage)
+	Init()
+	flag.Parse()
+	//namespace = "workflow-preview-openfaas-fn"
 
+	test := K8sYaml{}
+	/*
+		err := yaml.Unmarshal([]byte(yamldata_k8s), &test)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
+	*/
+	/*
+		fmt.Printf("K8S_YAML:\n%v\n\n", test)
+		fmt.Println(test.Deployment.K8S)
+		fmt.Println(test.Deployment.K8S[0])
+		fmt.Println(test.Deployment.K8S[1])
+		fmt.Println(len(test.Deployment.K8S))
+		fmt.Println(test.Deployment.K8S[0].Module)
+		fmt.Println(test.Deployment.K8S[0].Image)
+		fmt.Println(test.Deployment.K8S[0].Tag)
+		fmt.Println(test.Deployment.K8S[0].Stage)
+	*/
 	/*
 			test2 := OpenfaasYaml{}
 			err = yaml.Unmarshal([]byte(yamldata_openfaas), &test2)
@@ -115,18 +128,25 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	array := KubectlGetDeployment("default")
+	array := KubectlGetDeployment(namespace)
 	fmt.Println(len(array))
 	for i := range array {
 		if array[i] != "" && array[i] != "NAME" {
 			fmt.Println("deployment name : " + array[i])
-			imagename := GetDeploymentImage(clientSet, "default", array[i])
+			imagename := GetDeploymentImage(clientSet, namespace, array[i])
 			fmt.Println("Get deployment image name : " + imagename)
 			gitbranch, modulename, moduletag := ImagenameSplit(imagename)
+			//isopenfaas := IdentifyOpenfaas("default",array[i])
+			//fmt.Println(IdentifyOpenfaas(namespace, array[i]))
 			//			fmt.Println("gitbranch : " + gitbranch)
 			//			fmt.Println("modulename : " + modulename)
 			//			fmt.Println("tag : " + moduletag)
-			(&test.Deployment).AddK8sStruct(array[i], modulename, moduletag, gitbranch)
+			if IdentifyOpenfaas(namespace, array[i]) {
+				(&test.Deployment).AddOpenfaasStruct(array[i], modulename, moduletag, gitbranch)
+			} else {
+				(&test.Deployment).AddK8sStruct(array[i], modulename, moduletag, gitbranch)
+			}
+
 		}
 	}
 	d, err := yaml.Marshal(&test)
@@ -136,6 +156,24 @@ func main() {
 	//	fmt.Printf("--- t dump:\n%s\n\n", string(d))
 
 	WriteWithIoutil("test.txt", string(d))
+}
+
+func Init() {
+	flag.StringVar(&namespace, "namespace", "default", "k8s namesapce , such as default")
+}
+
+func IdentifyOpenfaas(i_namesapce string, i_deployment string) bool {
+	var i_token bool
+	i_cmd := "kubectl get deploy -l faas_function -n " + i_namesapce + " | grep " + i_deployment
+	i_cmd_result := RunCommand(i_cmd)
+
+	if strings.Contains(i_cmd_result, i_deployment) {
+		i_token = true
+	} else {
+		i_token = false
+	}
+
+	return i_token
 }
 
 func homeDir() string {
@@ -169,6 +207,7 @@ func FoundsPods(clientSet *kubernetes.Clientset, namespace string, pod string) {
 	//		time.Sleep(10 * time.Second)
 	//	}
 }
+
 func GetDeploymentImage(clientSet *kubernetes.Clientset, namespace string, deploymentName string) string {
 	deployment, err := clientSet.AppsV1beta1().Deployments(namespace).Get(deploymentName, metav1.GetOptions{})
 	var getimage string

@@ -39,3 +39,14 @@ func (s *Deployment) AddK8sStruct(module string, image string, tag string, stage
 		s.K8S[length-1].Stage = stage
 	*/
 }
+
+func (s *Deployment) AddOpenfaasStruct(module string, image string, tag string, stage string) {
+	var a Openfaas = Openfaas{
+		Module: module,
+		Image:  image,
+		Tag:    tag,
+		Stage:  stage,
+	}
+	s.Openfaas = append(s.Openfaas, a)
+
+}

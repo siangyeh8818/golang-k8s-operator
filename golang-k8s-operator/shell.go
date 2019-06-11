@@ -36,3 +36,10 @@ func exec_shell(s_command string) (string, string) {
 	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
 	return outStr, errStr
 }
+
+func RunCommand(commandStr string) string {
+	cmdstr := commandStr
+	out, _ := exec.Command("sh", "-c", cmdstr).Output()
+	strout := string(out)
+	return strout
+}
