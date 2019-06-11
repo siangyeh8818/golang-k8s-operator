@@ -11,5 +11,5 @@
 
 | flag      | 說明    | 預設值     |
 | ---------- | :-----------:  | :-----------: |
-|      | 輸出的yml檔名   | deploy.yml   |
+|   o   | 輸出的yml檔名   | deploy.yml   |
 |  namespace    |  要將哪個namespace的資源輸出   | default    |
