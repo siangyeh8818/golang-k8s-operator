@@ -2,6 +2,7 @@
 
 #用途
 將k8s現有環境轉化成部署的描述檔(可以想成gdeyamlOperator的部署規格)
+
 gdeyamOperator的repo : https://github.com/siangyeh8818/gdeyamlOperator
 
 #限制
